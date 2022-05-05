@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   HStack,
@@ -13,20 +13,23 @@ import { LineChart, CandlestickChart } from "react-native-wagmi-charts";
 import CoinDetailedHeader from "../components/CoinDetailedHeader";
 import FilterComponent from "../components/FilterComponent";
 import {
-  getDetailedCoinData,
-  getCoinMarketChart,
-  getCandleChartData,
-} from "../api";
-/*
-import {
+  getCoinDetailAsync,
   selectCoinDetailData,
   selectCoinDetailIsLoading,
-} from "../Redux/coinsDetailSlice";
+} from "../Redux/coinDetailSlice";
+
 import {
+  getCoinMarketAsync,
   selectCoinMarketData,
   selectCoinMarketIsLoading,
 } from "../Redux/coinMarketSlice";
-*/
+import {
+  getCandleStickChartAsync,
+  selectCandleStickChartData,
+  selectCandleStickChartIsLoading,
+} from "../Redux/candleStickChartSlice";
+import { useDispatch, useSelector } from "react-redux";
+
 const chartColor = "#16c784";
 const screenWidth = Dimensions.get("window").width * 0.8;
 
@@ -36,35 +39,34 @@ const CoinDetailedScreen = ({ route, navigation }) => {
   const [coinMarketData, setCoinMarketData] = useState([]);
   const [coinCandleChartData, setCoinCandleChartData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedRange, setSelectedRange] = useState("1");
-  const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
   */
+
   const dispatch = useDispatch();
   const { coinId } = route.params;
   const { colorMode } = useColorMode();
-  const coinDetailData = selectCoinDetailData();
-  const isCoinDetailLoading = selectCoinDetailIsLoading();
-  const coinMarketData = selectCoinMarketData();
-  const isMarketCoinLoading = selectCoinMarketIsLoading();
+  const coinDetailData = useSelector(selectCoinDetailData);
+  const isCoinDetailLoading = useSelector(selectCoinDetailIsLoading);
+  const coinMarketData = useSelector(selectCoinMarketData);
+  const isMarketCoinLoading = useSelector(selectCoinMarketIsLoading);
 
-  const fetchCandleStickChartData = async (selectedRangeValue) => {
-    const fetchedSelectedCandleChartData = await getCandleChartData(
-      coinId,
-      selectedRangeValue
-    );
-    setCoinCandleChartData(fetchedSelectedCandleChartData);
-  };
+  const coinCandleChartData = useSelector(selectCandleStickChartData);
+  const isCandleStickChartLoading = useSelector(
+    selectCandleStickChartIsLoading
+  );
+
+  const [selectedRange, setSelectedRange] = useState("1");
+  const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
 
   const onSelectedRangeChange = (selectedRangeValue) => {
     setSelectedRange(selectedRangeValue);
-    getCoinMarketAsync(coinId, selectedRangeValue);
-    fetchCandleStickChartData(selectedRangeValue);
+    dispatch(getCoinMarketAsync({ coinId, selectedRangeValue }));
+    dispatch(getCandleStickChartAsync({ coinId, selectedRangeValue }));
   };
 
   useEffect(() => {
-    dispatch(getCoinDetailDataAsync(coinId));
-    getCoinMarketAsync(coinId, 1);
-    fetchCandleStickChartData(1);
+    dispatch(getCoinDetailAsync(coinId));
+    dispatch(getCoinMarketAsync({ coinId, selectedRangeValue: "1" }));
+    dispatch(getCandleStickChartAsync({ coinId, selectedRangeValue: "1" }));
   }, []);
 
   useEffect(() => {
@@ -73,10 +75,13 @@ const CoinDetailedScreen = ({ route, navigation }) => {
         headerTitle: () => {
           return (
             <CoinDetailedHeader
-              coinId={coinDetailData.id}
-              image={coinDetailData.image.small}
-              symbol={coinDetailData.symbol}
-              marketCapRank={coinDetailData.market_data.market_cap_rank}
+              coinId={coinDetailData.id ?? ""}
+              image={
+                coinDetailData.image?.small ??
+                "https://assets.coingecko.com/coins/images/4128/small/solana.png?1547033579"
+              }
+              symbol={coinDetailData.symbol ?? ""}
+              marketCapRank={coinDetailData?.market_data?.market_cap_rank ?? ""}
             />
           );
         },
@@ -94,7 +99,9 @@ const CoinDetailedScreen = ({ route, navigation }) => {
     candle_data.push({ timestamp, open, high, low, close })
   );
 
-  return loading ? (
+  return isCoinDetailLoading ||
+    isMarketCoinLoading ||
+    isCandleStickChartLoading ? (
     <ActivityIndicator size="large" />
   ) : (
     <ScrollView>

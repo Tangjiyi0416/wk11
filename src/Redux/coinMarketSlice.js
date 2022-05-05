@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getMarketData } from "../api";
+import { getCoinMarketChart } from "../api";
 
 const initialState = {
   coinMarketData: {},
@@ -7,8 +7,9 @@ const initialState = {
 };
 const getCoinMarketAsync = createAsyncThunk(
   "coinMarket/getData",
-  async (coinId, selectedRange) => {
-    const data = await getCoinMarketChart(coinId, selectedRange);
+  async (para) => {
+    const { coinId, selectedRangeValue } = para;
+    const data = await getCoinMarketChart(coinId, selectedRangeValue);
     return data;
   }
 );

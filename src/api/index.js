@@ -24,6 +24,9 @@ export const getDetailedCoinData = async (coinId) => {
 
 export const getCoinMarketChart = async (coinId, selectedRange) => {
   try {
+    console.log(
+      `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${selectedRange}&interval=hourly`
+    );
     const response = await axios.get(
       `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=${selectedRange}&interval=hourly`
     );
@@ -35,6 +38,9 @@ export const getCoinMarketChart = async (coinId, selectedRange) => {
 
 export const getCandleChartData = async (coinId, days = 1) => {
   try {
+    console.log(
+      `https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=usd&days=${days}`
+    );
     const response = await axios.get(
       `https://api.coingecko.com/api/v3/coins/${coinId}/ohlc?vs_currency=usd&days=${days}`
     );

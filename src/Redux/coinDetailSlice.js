@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getMarketData } from "../api";
+import { getDetailedCoinData } from "../api";
 
 const initialState = {
   coinDetailData: {},
@@ -23,6 +23,7 @@ const coinDetailSlice = createSlice({
       .addCase(getCoinDetailAsync.fulfilled, (state, action) => {
         state.isLoading = false;
         // state.coinsData = action.payload;
+        // console.log(action.payload);
         state.coinDetailData = action.payload;
       });
   },
