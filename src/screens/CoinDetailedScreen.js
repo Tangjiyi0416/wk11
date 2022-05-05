@@ -29,6 +29,10 @@ import {
   selectCandleStickChartIsLoading,
 } from "../Redux/candleStickChartSlice";
 import { useDispatch, useSelector } from "react-redux";
+import {
+  selectIsCandleChartVisible,
+  toggleIsCandleChartVisible,
+} from "../Redux/candleChartVisibleSlice";
 
 const chartColor = "#16c784";
 const screenWidth = Dimensions.get("window").width * 0.8;
@@ -53,9 +57,8 @@ const CoinDetailedScreen = ({ route, navigation }) => {
   const isCandleStickChartLoading = useSelector(
     selectCandleStickChartIsLoading
   );
-
+  const isCandleChartVisible = useSelector(selectIsCandleChartVisible);
   const [selectedRange, setSelectedRange] = useState("1");
-  const [isCandleChartVisible, setIsCandleChartVisible] = useState(false);
 
   const onSelectedRangeChange = (selectedRangeValue) => {
     setSelectedRange(selectedRangeValue);
@@ -78,7 +81,7 @@ const CoinDetailedScreen = ({ route, navigation }) => {
               coinId={coinDetailData.id ?? ""}
               image={
                 coinDetailData.image?.small ??
-                "https://assets.coingecko.com/coins/images/4128/small/solana.png?1547033579"
+                "https://assets.coingecko.com/coins/images/1/small/bitcoin.png?1547033579"
               }
               symbol={coinDetailData.symbol ?? ""}
               marketCapRank={coinDetailData?.market_data?.market_cap_rank ?? ""}
@@ -120,7 +123,7 @@ const CoinDetailedScreen = ({ route, navigation }) => {
             colorScheme="emerald"
             name="line Mode"
             isChecked={!isCandleChartVisible}
-            onToggle={() => setIsCandleChartVisible(!isCandleChartVisible)}
+            onToggle={() => dispatch(toggleIsCandleChartVisible())}
             accessibilityLabel="line-mode"
             accessibilityHint="line or candle"
           />
